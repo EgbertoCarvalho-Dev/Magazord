@@ -1,0 +1,21 @@
+{
+  "name": "magazord/backend",
+  "description": "É um teste prático para vaga de BACKEND DEV PHP PLENO da MAGAZORD",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "App\\": "App"
+    }
+  },
+  "authors": [
+    {
+      "name": "Egberto Carvalho",
+      "email": "betofreitas16@gmail.com"
+    }
+  ],
+  "require": {
+    "doctrine/orm": "^2.16",
+    "doctrine/cache": "^2.2",
+    "symfony/cache": "^6.3"
+  }
+}
