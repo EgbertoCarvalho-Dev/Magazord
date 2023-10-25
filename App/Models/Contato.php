@@ -51,4 +51,14 @@ class Contato
 
         return $contato->__get('id');
     }
+
+    public function readContact($personID)
+    {
+        $entityManager = new EntityManagerFactory();
+        $entityManager = $entityManager->getEntityManager();
+
+        $productRepository = $entityManager->getRepository('App\Models\Contato');
+
+        return $productRepository->findBy(['idPessoa' => $personID]);
+    }
 }

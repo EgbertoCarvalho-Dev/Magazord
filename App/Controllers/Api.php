@@ -27,5 +27,36 @@ class Api
         session_start();
         $_SESSION['msg'] = true;
         header('Location: /');
+        return;
+    }
+
+    public function detalharPessoa($id)
+    {
+
+        $pessoa = new Pessoa();
+
+        $pessoa = $pessoa->lerPessoa($id);
+
+        $contato = new Contato();
+
+        $contatos = $contato->readContact($id);
+        $vectorContacts = [];
+        foreach ($contatos as $contato) {
+            $vectorContacts[] = [
+                'id' => $contato->id,
+                'type' => $contato->tipo,
+                'description' => $contato->descricao
+            ];
+        }
+
+        header('Content-Type: application/json');
+
+        $vector = [
+            'name' => $pessoa->nome,
+            'cpf' => $pessoa->cpf,
+            'contacts' => $vectorContacts
+        ];
+        echo json_encode($vector);
+        return;
     }
 }

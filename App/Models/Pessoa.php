@@ -63,4 +63,14 @@ class Pessoa
 
         return $queryBuilder->getQuery()->getResult();
     }
+
+    public function lerPessoa($id)
+    {
+        $entityManager = new EntityManagerFactory();
+        $entityManager = $entityManager->getEntityManager();
+
+        $productRepository = $entityManager->getRepository('App\Models\Pessoa');
+
+        return $productRepository->find($id);
+    }
 }

@@ -13,10 +13,14 @@ switch ($uri) {
         $controller->index();
         break;
     case '/api/adicionarPessoa':
-        echo '<pre>';
 
         $controller = new Api();
         $controller->adicionarPessoa($_POST);
+        break;
+
+    case '/api/consultarPessoa':
+        $controller = new Api();
+        $controller->detalharPessoa($_POST['id']);
         break;
     default:
         echo '404 Not Found';

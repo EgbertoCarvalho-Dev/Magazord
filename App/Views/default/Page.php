@@ -37,9 +37,7 @@ if (isset($_SESSION['msg']) && $_SESSION['msg']) {
                     </div>
                     <div class="card-body ">
                         <p class="fw-semibold text-center">
-                            Para pesquisar, só informar o que deseja abaixo.
-                            <br>
-                            A pesquisa será feita por NOME ou por CPF
+                            Para pesquisar, basta apenas digitar o nome da pessoa abaixo
                         </p>
                         <?php
                         if ($msg) {
@@ -83,7 +81,7 @@ if (isset($_SESSION['msg']) && $_SESSION['msg']) {
                                                 <td><?= $pessoa->nome ?></td>
                                                 <td><?= $pessoa->cpf ?></td>
                                                 <td>
-                                                    <button type="button" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></button>
+                                                    <button type="button" class="btn btn-sm btn-info" onclick="showPerson('<?= $pessoa->id ?>')"><i class="fas fa-eye"></i></button>
                                                     <button type="button" class="btn btn-sm btn-warning"><i class="fas fa-pen"></i></button>
                                                     <button type="button" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
                                                 </td>
@@ -178,6 +176,69 @@ if (isset($_SESSION['msg']) && $_SESSION['msg']) {
             </div>
         </div>
     </form>
+
+    <!-- Modal Body -->
+    <!-- if you want to close by clicking outside the modal, delete the last endpoint:data-bs-backdrop and data-bs-keyboard -->
+    <div class="modal fade" id="visualizarPessoa" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" role="dialog" aria-labelledby="modalTitleId" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitleId"><span class="badge bg-info">Visualizar</span> <span id="idPessoa">#3</span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="general">
+                    <h6>Informações Pessoais</h6>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label for="" class="form-label">Nome</label>
+                                <input type="text" class="form-control" disabled id="nome" aria-describedby="helpId" placeholder="">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label for="" class="form-label">CPF</label>
+                                <input type="text" class="form-control" disabled id="CPF" aria-describedby="helpId" placeholder="">
+                            </div>
+                        </div>
+                    </div>
+                    <h6>Informações de Contato</h6>
+                    <div class="row">
+                        <div class="col-12">
+
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">#</th>
+                                            <th scope="col">Tipo</th>
+                                            <th scope="col">Descrição</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="bodyContact">
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-body" id="loadInfoDetail">
+                    <div class="d-flex justify-content-center align-items-center">
+                        <div class="spinner-border text-primary spinner-border-sm" role="status" style="width: 4rem; height: 4rem;">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- Bootstrap JavaScript Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous">
     </script>
@@ -222,6 +283,56 @@ if (isset($_SESSION['msg']) && $_SESSION['msg']) {
 
         function removeField(btn) {
             $(btn).closest('.newField').remove();
+        }
+
+        function showPerson(id) {
+
+            $.ajax({
+                url: 'api/consultarPessoa',
+                type: 'POST',
+                data: {
+                    id: id,
+                },
+                beforeSend: () => {
+                    $('#general').hide();
+                    $('#loadInfoDetail').show();
+                    $('#visualizarPessoa').modal('show');
+                },
+                success: (data) => {
+                    $('#bodyContact').empty();
+
+                    if (data.contacts.length > 0) {
+                        data.contacts.map((item, i) => {
+                            let type = "";
+                            if (item.type == 'email') {
+                                type = '<span class="badge bg-primary">Email</span>';
+                            } else {
+                                type = '<span class="badge bg-info">Telefone</span>';
+                            }
+                            $('#bodyContact').append(`
+                            <tr>
+                                <td>${item.id}</td>
+                                <td>${type}</td>
+                                <td>${item.description}</td>
+                                <td>
+                                    <button type="button" class="btn btn-danger btn-sm">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            `);
+                        })
+                    } else {
+                        $('#bodyContact').html("<tr><td colspan='4' class='text-center'><h6 style='text-align:center;'>Nenhum contato cadastrado para esta pessoa</h6></td></tr>");
+                    }
+                    $('#nome').val(data.name);
+                    $('#CPF').val(data.cpf);
+                    $('#loadInfoDetail').fadeOut('fast', () => {
+                        $('#general').fadeIn('fast');
+                    })
+                }
+            })
+            $('#visualizarPessoa').modal('show');
         }
     </script>
 </body>
