@@ -9,19 +9,21 @@ use Doctrine\ORM\Mapping\Entity;
 use App\Helper\EntityManagerFactory;
 use Doctrine\ORM\Mapping\GeneratedValue;
 
+
 #[Entity]
-class Pessoa
+class Contato
 {
     #[Id]
     #[Column(type: Types::INTEGER)]
     #[GeneratedValue(strategy: 'AUTO')]
     private int $id;
-
     #[Column(type: Types::STRING)]
-    private string $nome;
-
+    private string $tipo;
     #[Column(type: Types::STRING)]
-    private string $cpf;
+    private string $descricao;
+    #[Column(type: Types::INTEGER)]
+    private int $idPessoa;
+
 
     public function __get($attr)
     {
@@ -33,34 +35,20 @@ class Pessoa
         $this->$attr = $value;
     }
 
-    public function criarPessoa($nome, $cpf)
-    {
 
-        $pessoa = new Pessoa();
-        $pessoa->__set('nome', $nome);
-        $pessoa->__set('cpf', $cpf);
+    public function adicionarContato($idPessoa, $tipo, $descricao)
+    {
+        $contato = new Contato();
+        $contato->__set('idPessoa', $idPessoa);
+        $contato->__set('tipo', $tipo);
+        $contato->__set('descricao', $descricao);
 
         $entityManager = new EntityManagerFactory();
 
         $entityManager = $entityManager->getEntityManager();
-        $entityManager->persist($pessoa);
+        $entityManager->persist($contato);
         $entityManager->flush();
 
-        return $pessoa->__get('id');
-    }
-
-    public function listarPessoas()
-    {
-        $entityManager = new EntityManagerFactory();
-
-        $entityManager = $entityManager->getEntityManager();
-
-        $productRepository = $entityManager->getRepository('App\Models\Pessoa');
-
-        $queryBuilder = $productRepository->createQueryBuilder('p');
-
-        $queryBuilder->select('p');
-
-        return $queryBuilder->getQuery()->getResult();
+        return $contato->__get('id');
     }
 }

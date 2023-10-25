@@ -10,8 +10,10 @@ class Home
     {
 
         $pessoa = new Pessoa();
-        die();
-        require(dirname(__DIR__) . '/Views/default/indexPage.php');
+
+        $pessoas = $pessoa->listarPessoas();
+
+        require(dirname(__DIR__) . '/Views/default/Page.php');
         return;
     }
 }
