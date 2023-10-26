@@ -22,6 +22,16 @@ switch ($uri) {
         $controller = new Api();
         $controller->detalharPessoa($_POST['id']);
         break;
+    case '/api/removerContato':
+        $controller = new Api();
+        $controller->removerContato($_POST['id']);
+        break;
+    case '/api/removerPessoa':
+        $controller = new Api();
+        $controller->removerPessoa($_POST['id']);
+    case '/api/pesquisarPessoa':
+        $controller = new Api();
+        $controller->pesquisarPessoa($_POST['nome']);
     default:
         echo '404 Not Found';
 }

@@ -76,14 +76,14 @@ if (isset($_SESSION['msg']) && $_SESSION['msg']) {
                                     if (count($pessoas) > 0) {
                                         foreach ($pessoas as $pessoa) {
                                     ?>
-                                            <tr class="">
+                                            <tr class="itemPessoa">
                                                 <td scope="row"><?= $pessoa->id ?></td>
                                                 <td><?= $pessoa->nome ?></td>
                                                 <td><?= $pessoa->cpf ?></td>
                                                 <td>
                                                     <button type="button" class="btn btn-sm btn-info" onclick="showPerson('<?= $pessoa->id ?>')"><i class="fas fa-eye"></i></button>
                                                     <button type="button" class="btn btn-sm btn-warning"><i class="fas fa-pen"></i></button>
-                                                    <button type="button" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                                                    <button type="button" class="btn btn-sm btn-danger" onclick="removerPessoa('<?= $pessoa->id ?>', this)"><i class="fas fa-trash"></i></button>
                                                 </td>
                                             </tr>
                                         <?php }
@@ -287,6 +287,7 @@ if (isset($_SESSION['msg']) && $_SESSION['msg']) {
 
         function showPerson(id) {
 
+            $('#idPessoa').html('#' + id);
             $.ajax({
                 url: 'api/consultarPessoa',
                 type: 'POST',
@@ -310,12 +311,12 @@ if (isset($_SESSION['msg']) && $_SESSION['msg']) {
                                 type = '<span class="badge bg-info">Telefone</span>';
                             }
                             $('#bodyContact').append(`
-                            <tr>
+                            <tr class="itemContact">
                                 <td>${item.id}</td>
                                 <td>${type}</td>
                                 <td>${item.description}</td>
                                 <td>
-                                    <button type="button" class="btn btn-danger btn-sm">
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="removerContato('${item.id}', this)">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
@@ -332,7 +333,39 @@ if (isset($_SESSION['msg']) && $_SESSION['msg']) {
                     })
                 }
             })
-            $('#visualizarPessoa').modal('show');
+        }
+
+        function removerContato(id, btn) {
+            $(btn).closest('.itemContact').remove();
+            $.ajax({
+                url: 'api/removerContato',
+                type: 'POST',
+                data: {
+                    id: id
+                },
+                success: (data) => {
+                    if (data.status != true) {
+                        alert('Falha ao excluir este contato, tente novamente mais tarde.');
+                        $('#visualizarPessoa').modal('hide');
+                    }
+                }
+            })
+        }
+
+        function removerPessoa(id, btn) {
+            $(btn).closest('.itemPessoa').remove();
+            $.ajax({
+                url: 'api/removerPessoa',
+                type: 'POST',
+                data: {
+                    id: id
+                },
+                success: (data) => {
+                    if (data.status != true) {
+                        alert('Falha ao excluir esta pessoa, tente novamente mais tarde.');
+                    }
+                }
+            })
         }
     </script>
 </body>

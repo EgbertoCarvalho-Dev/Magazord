@@ -52,13 +52,29 @@ class Contato
         return $contato->__get('id');
     }
 
-    public function readContact($personID)
+    public function lerContato($idPessoa)
     {
         $entityManager = new EntityManagerFactory();
         $entityManager = $entityManager->getEntityManager();
 
         $productRepository = $entityManager->getRepository('App\Models\Contato');
 
-        return $productRepository->findBy(['idPessoa' => $personID]);
+        return $productRepository->findBy(['idPessoa' => $idPessoa]);
+    }
+
+    public function removerContato($idContato)
+    {
+        $entityManager = new EntityManagerFactory();
+        $entityManager = $entityManager->getEntityManager();
+
+        $pessoa = $entityManager->getRepository('App\Models\Contato')->find($idContato);
+        if ($pessoa !== null) {
+            $entityManager->remove($pessoa);
+            $entityManager->flush();
+
+            return true;
+        } else {
+            return false;
+        }
     }
 }

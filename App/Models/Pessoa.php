@@ -73,4 +73,33 @@ class Pessoa
 
         return $productRepository->find($id);
     }
+
+    public function removerPessoa($idContato)
+    {
+        $entityManager = new EntityManagerFactory();
+        $entityManager = $entityManager->getEntityManager();
+
+        $pessoa = $entityManager->getRepository('App\Models\Pessoa')->find($idContato);
+        if ($pessoa !== null) {
+            $entityManager->remove($pessoa);
+            $entityManager->flush();
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function pesquisarNome($pesquisa)
+    {
+        $entityManager = new EntityManagerFactory();
+        $entityManager = $entityManager->getEntityManager();
+        $query = $entityManager->createQuery('
+                                                SELECT p
+                                                FROM App\Models\Pessoa p
+                                                WHERE p.nome LIKE :nome
+                                            ')->setParameter('nome', '%' . $pesquisa . '%');
+
+        return $query->getResult();
+    }
 }

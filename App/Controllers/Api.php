@@ -39,7 +39,7 @@ class Api
 
         $contato = new Contato();
 
-        $contatos = $contato->readContact($id);
+        $contatos = $contato->lerContato($id);
         $vectorContacts = [];
         foreach ($contatos as $contato) {
             $vectorContacts[] = [
@@ -57,6 +57,42 @@ class Api
             'contacts' => $vectorContacts
         ];
         echo json_encode($vector);
+        return;
+    }
+
+    public function removerContato($id)
+    {
+        $contato = new Contato();
+
+        if ($contato->removerContato($id)) {
+            $data['status'] = true;
+        } else {
+            $data['status'] = false;
+        }
+
+        header('Content-Type: application/json');
+
+        echo json_encode($data);
+    }
+
+    public function removerPessoa($id)
+    {
+        $pessoa = new Pessoa();
+
+        if ($pessoa->removerPessoa($id)) {
+            $data['status'] = true;
+        } else {
+            $data['status'] = false;
+        }
+
+        header('Content-Type: application/json');
+
+        echo json_encode($data);
+        return;
+    }
+
+    public function pesquisarPessoa($id)
+    {
         return;
     }
 }
