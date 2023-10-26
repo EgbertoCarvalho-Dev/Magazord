@@ -77,4 +77,17 @@ class Contato
             return false;
         }
     }
+
+    public function atualizarContato($idContato, $tipo, $descricao)
+    {
+        $entityManager = new EntityManagerFactory();
+        $entityManager = $entityManager->getEntityManager();
+
+        $contato = $entityManager->getRepository('App\Models\Contato')->find($idContato);
+
+        $contato->__set('tipo', $tipo);
+        $contato->__set('descricao', $descricao);
+
+        $entityManager->flush();
+    }
 }

@@ -1,15 +1,3 @@
-<?php
-session_start();
-
-
-if (isset($_SESSION['msg']) && $_SESSION['msg']) {
-    unset($_SESSION['msg']);
-    $msg = true;
-} else {
-    $msg = false;
-}
-
-?>
 <!doctype html>
 <html lang="en">
 
@@ -49,16 +37,18 @@ if (isset($_SESSION['msg']) && $_SESSION['msg']) {
                         <?php
                         }
                         ?>
-                        <div class="row">
-                            <div class="col-11">
-                                <div class="mb-3">
-                                    <input type="text" class="form-control" name="" id="" aria-describedby="helpId" placeholder="Pesquisar">
+                        <form action="/api/pesquisarPessoa" enctype="multipart/form-data" method="POST">
+                            <div class="row">
+                                <div class="col-11">
+                                    <div class="mb-3">
+                                        <input type="text" class="form-control" name="nome" value="<?= $pesquisa ?>" aria-describedby="helpId" placeholder="Pesquisar">
+                                    </div>
+                                </div>
+                                <div class="col-1">
+                                    <button type="submit" class="btn btn-primary"><i class="fa-solid fa-magnifying-glass"></i></button>
                                 </div>
                             </div>
-                            <div class="col-1">
-                                <button type="button" class="btn btn-primary"><i class="fa-solid fa-magnifying-glass"></i></button>
-                            </div>
-                        </div>
+                        </form>
                         <h6><i class="fa-solid fa-square-poll-vertical"></i> Resultado</h6>
                         <hr>
                         <div class="table-responsive">
@@ -82,7 +72,7 @@ if (isset($_SESSION['msg']) && $_SESSION['msg']) {
                                                 <td><?= $pessoa->cpf ?></td>
                                                 <td>
                                                     <button type="button" class="btn btn-sm btn-info" onclick="showPerson('<?= $pessoa->id ?>')"><i class="fas fa-eye"></i></button>
-                                                    <button type="button" class="btn btn-sm btn-warning"><i class="fas fa-pen"></i></button>
+                                                    <button type="button" class="btn btn-sm btn-warning" onclick="atualizarPessoa('<?= $pessoa->id ?>')"><i class="fas fa-pen"></i></button>
                                                     <button type="button" class="btn btn-sm btn-danger" onclick="removerPessoa('<?= $pessoa->id ?>', this)"><i class="fas fa-trash"></i></button>
                                                 </td>
                                             </tr>
@@ -177,13 +167,92 @@ if (isset($_SESSION['msg']) && $_SESSION['msg']) {
         </div>
     </form>
 
+    <form action="/api/atualizarPessoa" method="POST" enctype="multipart/form-data">
+        <div class="modal fade" id="atualizarPessoa" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" role="dialog" aria-labelledby="modalTitleId" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalTitleId"><span class="badge bg-success">Atualizar</span> <span id="idPessoaEditHeader"></span></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="editBody">
+                        <div class=" row">
+                            <div class="col-4 h-100">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Informações Pessoais</h6>
+                                        <div class="mb-3">
+                                            <label for="" class="form-label">Nome</label>
+                                            <input type="text" class="form-control" required name="nome" id="nomeEdit" aria-describedby="helpId" placeholder="">
+                                            <input type="hidden" name="idPessoa" id="idPessoa">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="" class="form-label">CPF</label>
+                                            <input type="text" class="form-control cpf" required name="cpf" id="cpfEdit" aria-describedby="helpId" placeholder="">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-8">
+                                <h6>Informações de Contato</h6>
+
+                                <div class="row">
+                                    <div class="col-12" id="camposEdit">
+                                        <div class="row">
+                                            <div class="col-2">
+                                                <div class="mb-3">
+                                                    <label for="tipo1" class="form-label">Tipo</label>
+                                                    <select class="form-select" name="contato[1][tipo]" id="tipo1">
+                                                        <option selected value="email">Email</option>
+                                                        <option value="tel">Telefone</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-9">
+                                                <div class="mb-3">
+                                                    <label for="descricao1" class="form-label">Descrição</label>
+                                                    <input type="text" class="form-control" name="contato[1][descricao]" id="descricao1" aria-describedby="helpId" placeholder="">
+                                                </div>
+                                            </div>
+                                            <div class="col-1 pt-4">
+                                                <div class="mb-3 pt-2 text-center">
+                                                    <button type="button" class="btn btn-secondary"><i class="fas fa-trash"></i></button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 text-center">
+                                        <button type="button" class="btn btn-success" onclick="adicionarCampos(true);">Adicionar Campos</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-body" id="loadBodyEdit">
+                        <div class="d-flex justify-content-center align-items-center">
+                            <div class="spinner-border text-primary spinner-border-sm" role="status" style="width: 4rem; height: 4rem;">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                        <button type="submit" class="btn btn-primary">Salvar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+
     <!-- Modal Body -->
     <!-- if you want to close by clicking outside the modal, delete the last endpoint:data-bs-backdrop and data-bs-keyboard -->
     <div class="modal fade" id="visualizarPessoa" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" role="dialog" aria-labelledby="modalTitleId" aria-hidden="true">
         <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalTitleId"><span class="badge bg-info">Visualizar</span> <span id="idPessoa">#3</span></h5>
+                    <h5 class="modal-title" id="modalTitleId"><span class="badge bg-info">Visualizar</span> <span id="idPessoaHeader">#3</span></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body" id="general">
@@ -252,9 +321,11 @@ if (isset($_SESSION['msg']) && $_SESSION['msg']) {
         })
         var fields = 1;
 
-        function adicionarCampos() {
+        function adicionarCampos(edit = false) {
             fields++;
-            $('#campos').append(`
+
+            let info = edit == true ? '#camposEdit' : '#campos';
+            $(info).append(`
                 <div class="row newField">
                     <div class="col-2">
                         <div class="mb-3">
@@ -287,7 +358,7 @@ if (isset($_SESSION['msg']) && $_SESSION['msg']) {
 
         function showPerson(id) {
 
-            $('#idPessoa').html('#' + id);
+            $('#idPessoaHeader').html('#' + id);
             $.ajax({
                 url: 'api/consultarPessoa',
                 type: 'POST',
@@ -366,6 +437,68 @@ if (isset($_SESSION['msg']) && $_SESSION['msg']) {
                     }
                 }
             })
+        }
+
+        function atualizarPessoa(id) {
+            $('#idPessoaEditHeader').html('#' + id);
+            $.ajax({
+                url: 'api/consultarPessoa',
+                type: 'POST',
+                data: {
+                    id: id,
+                },
+                beforeSend: () => {
+                    $('#editBody').hide();
+                    $('#loadBodyEdit').show();
+                    $('#atualizarPessoa').modal('show');
+                    $('#camposEdit').empty();
+                },
+                success: (data) => {
+                    console.log(data);
+                    $('#idPessoa').val(data.id);
+                    $('#nomeEdit').val(data.name);
+                    $('#cpfEdit').val(data.cpf);
+                    fields = 1;
+                    if (data.contacts.length > 0) {
+                        data.contacts.map((item, i) => {
+                            let email = '';
+                            let tel = '';
+                            if (item.type == 'email') {
+                                email = ' selected ';
+                            } else {
+                                tel = ' selected ';
+                            }
+                            $('#camposEdit').append(`
+                            <div class="row newField">
+                                <div class="col-2">
+                                    <div class="mb-3">
+                                        <label for="tipo${fields}" class="form-label">Tipo</label>
+                                        <select class="form-select" name="contato[${fields}][tipo]" id="tipo${fields}">
+                                            <option ${email} value="email">Email</option>
+                                            <option ${tel} value="tel">Telefone</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-10">
+                                    <div class="mb-3">
+                                        <label for="descricao${fields}" class="form-label">Descrição</label>
+                                        <input value="${item.description}" type="text" class="form-control" name="contato[${fields}][descricao]" id="descricao${fields}" aria-describedby="helpId" placeholder="">
+                                        <input type="hidden" name="contato[${fields}][id]" value="${item.id}">
+                                    </div>
+                                </div>
+                            </div>
+                        
+                        `)
+                            fields++;
+                        })
+                    } else {
+
+                    }
+                    $('#loadBodyEdit').fadeOut('fast', () => {
+                        $('#editBody').fadeIn('fast');
+                    })
+                }
+            });
         }
     </script>
 </body>

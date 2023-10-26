@@ -52,6 +52,7 @@ class Api
         header('Content-Type: application/json');
 
         $vector = [
+            'id' => $pessoa->id,
             'name' => $pessoa->nome,
             'cpf' => $pessoa->cpf,
             'contacts' => $vectorContacts
@@ -94,5 +95,25 @@ class Api
     public function pesquisarPessoa($id)
     {
         return;
+    }
+
+    public function atualizarPessoa($args)
+    {
+        $contatos = $args['contato'];
+        $pessoa = new Pessoa();
+
+        $pessoa->atualizarPessoa($args['idPessoa'], $args['nome'], $args['cpf']);
+
+        foreach ($contatos as $contato) {
+            $contatoORM = new Contato();
+            if (isset($contato['id'])) {
+                $contatoORM->atualizarContato($contato['id'], $contato['tipo'], $contato['descricao']);
+            } else {
+                $contatoORM->adicionarContato($args['idPessoa'], $contato['tipo'], $contato['descricao']);
+            }
+        }
+        session_start();
+        $_SESSION['msg'] = true;
+        header('Location: /');
     }
 }

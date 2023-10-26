@@ -9,6 +9,7 @@ $uri = $_SERVER['REQUEST_URI'];
 
 switch ($uri) {
     case '/':
+
         $controller = new Home();
         $controller->index();
         break;
@@ -29,9 +30,16 @@ switch ($uri) {
     case '/api/removerPessoa':
         $controller = new Api();
         $controller->removerPessoa($_POST['id']);
+        break;
     case '/api/pesquisarPessoa':
+        session_start();
+        $_SESSION['pesquisa'] = $_POST['nome'];
+        header("Location: /");
+        break;
+    case '/api/atualizarPessoa':
         $controller = new Api();
-        $controller->pesquisarPessoa($_POST['nome']);
+        $controller->atualizarPessoa($_POST);
+        break;
     default:
         echo '404 Not Found';
 }

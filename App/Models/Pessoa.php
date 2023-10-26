@@ -102,4 +102,17 @@ class Pessoa
 
         return $query->getResult();
     }
+
+    public function atualizarPessoa($idPessoa, $nome, $cpf)
+    {
+        $entityManager = new EntityManagerFactory();
+        $entityManager = $entityManager->getEntityManager();
+
+        $pessoa = $entityManager->getRepository('App\Models\Pessoa')->find($idPessoa);
+
+        $pessoa->__set('nome', $nome);
+        $pessoa->__set('cpf', $cpf);
+
+        $entityManager->flush();
+    }
 }
